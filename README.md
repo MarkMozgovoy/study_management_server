@@ -11,4 +11,4 @@
 Browse the [sample data](/sample_data) to see the format of the expected json response for the various endpoints.
 
 ## Documentation
-Read more about the **Study Management Life-Cycle** [here](/docs/lifecycle).
+Read more about the **Study Management Life-Cycle** [here](/docs/lifecycle.md).
