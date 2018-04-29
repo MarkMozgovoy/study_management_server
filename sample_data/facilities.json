@@ -1,0 +1,29 @@
+[
+  {
+    "facilityId": "FACILITY:f9a1670e-bddd-4f3b-91d4-b14998eb66bc",
+    "name": "St. John's University (Staten Island)",
+    "equipmentList": [
+      {
+        "equipmentId": "EQUIPMENT:f285077e-3aa1-40e1-8e1f-fe8a621a660d",
+        "name": "Brain Sucker",
+        "abbreviation": "BS"
+      }
+    ]
+  },
+  {
+    "facilityId": "FACILITY:e9f63a91-c299-4201-911b-c5e92dc175cb",
+    "name": "St. John's University (Queens)",
+    "equipmentList": [
+      {
+        "equipmentId": "EQUIPMENT:149a2e8b-7774-47ad-97c3-6c9ea3aa5f9c",
+        "name": "Eye Tracking",
+        "abbreviation": "ET"
+      },
+      {
+        "equipmentId": "EQUIPMENT:1ce35761-867d-4d02-9706-ce516c5df4ae",
+        "name": "Electrocardiogram",
+        "abbreviation": "EKG"
+      }
+    ]
+  }
+]

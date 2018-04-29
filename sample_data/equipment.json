@@ -1,0 +1,12 @@
+[
+  {
+    "equipmentId": "EQUIPMENT:1ce35761-867d-4d02-9706-ce516c5df4ae",
+    "name": "Electrocardiogram",
+    "abbreviation": "EKG"
+  },
+  {
+    "equipmentId": "EQUIPMENT:149a2e8b-7774-47ad-97c3-6c9ea3aa5f9c",
+    "name": "Eye Tracking",
+    "abbreviation": "EYE"
+  }
+]

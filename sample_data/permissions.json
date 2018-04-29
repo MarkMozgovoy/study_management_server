@@ -1,0 +1,10 @@
+[
+  {
+    "role": "OWNER",
+    "userId": "USER:TEST_USER"
+  },
+  {
+    "role": "ADMIN",
+    "userId": "USER:TEST_USER_2"
+  }
+]
