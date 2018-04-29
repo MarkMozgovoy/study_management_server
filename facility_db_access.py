@@ -1,6 +1,7 @@
 import boto3
 from facility import Facility
-from equipment_db_access import loadEquipmentList
+import equipment_db_access
+import study_db_access
 
 dynamodb = boto3.resource('dynamodb')
 FacilityTable = dynamodb.Table('Facility')
@@ -10,7 +11,7 @@ def createFacility(facilityData):
     f = Facility()
     f.name = facilityData["name"]
     if "equipmentList" in facilityData:
-        f.equipmentList = loadEquipmentList(facilityData["equipmentList"])
+        f.equipmentList = equipment_db_access.loadEquipmentList(facilityData["equipmentList"])
     FacilityTable.put_item(Item=f.toDynamo())
     return f
 
@@ -24,6 +25,16 @@ def getAllFacilities():
     facilityListData = response["Items"]
     return loadFacilityList(facilityListData)
 
+def getFacilitiesForStudy(studyId):
+    study = study_db_access.getStudy(studyId)
+    studyEquipmentList = study.equipmentList
+    allFacilities = getAllFacilities()
+    facilityList = []
+    for facility in allFacilities:
+        if facilityContainsAllEquipment(facility, studyEquipmentList):
+            facilityList.append(facility)
+    return facilityList
+
 #Helper functions to convert lists/dicts into Facility objects
 def loadFacility(facilityData):
     """Returns a facility object for the given data"""
@@ -35,7 +46,7 @@ def loadFacility(facilityData):
     f.facilityId = facilityData["facilityId"]
     f.name = facilityData["name"]
     if "equipmentList" in facilityData:
-        f.equipmentList = loadEquipmentList(facilityData["equipmentList"])
+        f.equipmentList = equipment_db_access.loadEquipmentList(facilityData["equipmentList"])
     return f
 
 def loadFacilityList(facilityListData):
@@ -48,3 +59,14 @@ def loadFacilityList(facilityListData):
         else: #type(f)==dict
             fl.append(loadFacility(f))
     return fl
+
+#Other Helper functions
+def facilityContainsAllEquipment(facility, studyEquipmentList):
+    for se in studyEquipmentList:
+        facilityContainsSE = False
+        for fe in facility.equipmentList:
+            if (se==fe):
+                facilityContainsSE = True
+        if not facilityContainsSE:
+            return False
+    return True

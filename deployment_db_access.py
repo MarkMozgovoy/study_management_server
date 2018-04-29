@@ -1,5 +1,5 @@
 from deployment import Deployment
-from facility_db_access import loadFacility
+import facility_db_access
 
 #Helper functions to convert lists/dicts into Deployment objects
 def loadDeployment(deploymentData):
@@ -15,7 +15,7 @@ def loadDeployment(deploymentData):
     d.archived = deploymentData["archived"]
     d.goalSampleSize = int(deploymentData["goalSampleSize"])
     d.currentSampleSize = int(deploymentData["currentSampleSize"])
-    d.facility = loadFacility(deploymentData["facility"])
+    d.facility = facility_db_access.loadFacility(deploymentData["facility"])
     return d
 
 def loadDeploymentList(deploymentListData):

@@ -1,7 +1,7 @@
 import boto3
 from study import Study
-from equipment_db_access import loadEquipmentList
-from deployment_db_access import loadDeploymentList
+import equipment_db_access
+import deployment_db_access
 
 dynamodb = boto3.resource('dynamodb')
 StudyTable = dynamodb.Table('Study')
@@ -13,7 +13,7 @@ def createStudy(studyData):
     if "description" in studyData:
         s.description = studyData["description"]
     if "equipmentList" in studyData:
-        s.equipmentList = loadEquipmentList(studyData["equipmentList"])
+        s.equipmentList = equipment_db_access.loadEquipmentList(studyData["equipmentList"])
     StudyTable.put_item(Item=s.toDynamo())
     return s
 
@@ -35,7 +35,7 @@ def loadStudy(studyData):
     s.dateModified = studyData["dateModified"]
     s.archived = studyData["archived"]
     if "deploymentList" in studyData:
-        s.deploymentList = loadDeploymentList(studyData["deploymentList"])
+        s.deploymentList = deployment_db_access.loadDeploymentList(studyData["deploymentList"])
     if "equipmentList" in studyData:
-        s.equipmentList = loadEquipmentList(studyData["equipmentList"])
+        s.equipmentList = equipment_db_access.loadEquipmentList(studyData["equipmentList"])
     return s

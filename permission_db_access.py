@@ -1,6 +1,6 @@
 import boto3
 from boto3.dynamodb.conditions import Key
-from study_db_access import getStudy
+import study_db_access
 
 dynamodb = boto3.resource('dynamodb')
 PermissionTable = dynamodb.Table('Permission')
@@ -63,7 +63,7 @@ def getStudiesForUser(userId):
     studyList = []
     for permission in permissionData:
         studyId = permission["studyOrUserId"]
-        studyList.append(getStudy(studyId))
+        studyList.append(study_db_access.getStudy(studyId))
     return studyList
 
 def getUserPermissionsForStudy(studyId):

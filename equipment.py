@@ -11,3 +11,9 @@ class Equipment(DBHelper):
         if forDynamo:
             return self.equipmentId
         return self.__dict__
+    def __eq__(self, other):
+        return (
+            self.equipmentId==other.equipmentId and
+            self.name==other.name and
+            self.abbreviation==other.abbreviation
+        )

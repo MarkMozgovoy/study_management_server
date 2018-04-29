@@ -1,6 +1,8 @@
 from flask import Flask, request
-import equipment_db_access, facility_db_access
-import permission_db_access, study_db_access
+import equipment_db_access
+import facility_db_access
+import permission_db_access
+import study_db_access
 from dbhelper import toJson
 
 app = Flask(__name__)
@@ -49,17 +51,22 @@ def getStudy(studyId):
     study = study_db_access.getStudy(studyId)
     return toJson(study)
 
+@app.route('/studies/<studyId>/facilities', methods=['GET'])
+def getFacilitiesForStudy(studyId):
+    facilityList = facility_db_access.getFacilitiesForStudy(studyId)
+    return toJson(facilityList)
+
+@app.route('/studies/<studyId>/permissions', methods=['GET'])
+def getPermissionsForStudy(studyId):
+    userPermissionList = permission_db_access.getUserPermissionsForStudy(studyId)
+    return toJson(userPermissionList)
+
 #Permissions endpoints
 @app.route('/permissions', methods=['POST'])
 def createAdminForStudy():
     permissionData = request.get_json()
     userPermission = permission_db_access.createAdminForStudy(permissionData)
     return toJson(userPermission)
-
-@app.route('/permissions/<studyId>', methods=['GET'])
-def getPermissionsForStudy(studyId):
-    userPermissionList = permission_db_access.getUserPermissionsForStudy(studyId)
-    return toJson(userPermissionList)
 
 #Helper functions
 def getUserId():
