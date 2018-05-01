@@ -1,5 +1,17 @@
 from deployment import Deployment
 import facility_db_access
+import study_db_access
+
+##CRUD functions that read/write to dynamo
+def getDeploymentForStudy(studyId, deploymentId):
+    for deployment in getAllDeploymentsForStudy(studyId):
+        if deployment.deploymentId==deploymentId:
+            return deployment
+    return {}
+
+def getAllDeploymentsForStudy(studyId):
+    study = study_db_access.getStudy(studyId)
+    return study.deploymentList
 
 #Helper functions to convert lists/dicts into Deployment objects
 def loadDeployment(deploymentData):

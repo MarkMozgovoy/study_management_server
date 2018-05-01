@@ -9,9 +9,7 @@ PermissionTable = dynamodb.Table('Permission')
 def createOwnerForStudy(userId, studyId):
     return createUserPermissionForStudy(userId, studyId, "OWNER")
 
-def createAdminForStudy(permissionData):
-    userId = permissionData["userId"]
-    studyId = permissionData["studyId"]
+def createAdminForStudy(userId, studyId):
     if userHasPermissionForStudy(userId, studyId):
         return getUserPermissionForStudy(userId, studyId)
     else:
@@ -66,7 +64,7 @@ def getStudiesForUser(userId):
         studyList.append(study_db_access.getStudy(studyId))
     return studyList
 
-def getUserPermissionsForStudy(studyId):
+def getPermissionsForStudy(studyId):
     response = PermissionTable.query(
         KeyConditionExpression = Key("userOrStudyId").eq(studyId)
     )
@@ -76,8 +74,8 @@ def getUserPermissionsForStudy(studyId):
         userId = permission["studyOrUserId"]
         role = permission["role"]
         userPermission = {
-            "role": role,
-            "userId": userId
+            "userId": userId,
+            "role": role
         }
         userPermissionList.append(userPermission)
     return userPermissionList
