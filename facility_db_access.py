@@ -2,16 +2,22 @@ import boto3
 from facility import Facility
 import equipment_db_access
 import study_db_access
+import errors
 
 dynamodb = boto3.resource('dynamodb')
 FacilityTable = dynamodb.Table('Facility')
 
 #CRUD functions that read/write to dynamo
 def createFacility(facilityData):
+    #check that facilityData is valid
+    if "name" not in deploymentData or len(deploymentData["name"])==0:
+        raise errors.BadRequestError("Facility must have attribute 'name'")
+    #construct the facility
     f = Facility()
     f.name = facilityData["name"]
     if "equipmentList" in facilityData:
         f.equipmentList = equipment_db_access.loadEquipmentList(facilityData["equipmentList"])
+    #create the facility
     FacilityTable.put_item(Item=f.toDynamo())
     return f
 
@@ -51,13 +57,10 @@ def loadFacility(facilityData):
 
 def loadFacilityList(facilityListData):
     """Returns a list of Facility objects for the given data"""
-    #facilityListData can be a list of facilityIds (str) or facilityData (dict)
+    #facilityListData can be a list of facilityIds (str), or facilityData (dict)
     fl = []
     for f in facilityListData:
-        if type(f)==str:
-            fl.append(getFacility(f))
-        else: #type(f)==dict
-            fl.append(loadFacility(f))
+        fl.append(loadFacility(f))
     return fl
 
 #Other Helper functions

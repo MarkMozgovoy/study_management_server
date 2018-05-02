@@ -120,11 +120,11 @@ def getUserId():
 
 #Error Handling
 @app.errorhandler(404)
-def pageNotFound(e):
+def handleNotFoundEror(e):
     return toJson({"error":type(e).__name__, "status":404, "message":str(e)}), 404
 
 @app.errorhandler(500)
-def internalServerError(e):
+def handleInternalServerError(e):
     return toJson({"error":type(e).__name__, "status":500, "message":"Internal Server Error"}), 500
 
 @app.errorhandler(errors.APIError)
