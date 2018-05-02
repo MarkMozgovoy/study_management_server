@@ -68,7 +68,10 @@ def getFacilitiesForStudy(studyId):
 @app.route('/studies/<studyId>/permissions', methods=['POST'])
 def createPermissionForStudy(studyId):
     validateUser(studyId)
-    userId = request.get_json()["userId"]
+    permissionData = request.get_json()
+    if not ("userId" in permissionData and type(permissionData["userId"])==str and len(permissionData["userId"])>0):
+        raise errors.BadRequestError("Permission must have attribute 'userId' (type=str and length>0)")
+    userId = permissionData["userId"]
     userPermission = permission_db_access.createAdminForStudy(userId, studyId)
     return toJson(userPermission)
 

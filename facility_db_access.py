@@ -10,8 +10,8 @@ FacilityTable = dynamodb.Table('Facility')
 #CRUD functions that read/write to dynamo
 def createFacility(facilityData):
     #check that facilityData is valid
-    if "name" not in deploymentData or len(deploymentData["name"])==0:
-        raise errors.BadRequestError("Facility must have attribute 'name'")
+    if not ("name" in deploymentData and type(deploymentData["name"])==str and len(deploymentData["name"])>0):
+        raise errors.BadRequestError("Facility must have attribute 'name' (type=str and length>0)")
     #construct the facility
     f = Facility()
     f.name = facilityData["name"]
