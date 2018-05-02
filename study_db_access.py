@@ -22,6 +22,10 @@ def getStudy(studyId):
     studyData = response["Item"]
     return loadStudy(studyData)
 
+def updateStudy(study):
+    StudyTable.put_item(Item=study.toDynamo())
+    return study
+
 #Helper functions to convert lists/dicts into Study objects
 def loadStudy(studyData):
     """Returns a Study object for the given data"""

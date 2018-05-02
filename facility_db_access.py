@@ -65,7 +65,7 @@ def facilityContainsAllEquipment(facility, studyEquipmentList):
     for se in studyEquipmentList:
         facilityContainsSE = False
         for fe in facility.equipmentList:
-            if (se==fe):
+            if se.equipmentId == fe.equipmentId:
                 facilityContainsSE = True
         if not facilityContainsSE:
             return False

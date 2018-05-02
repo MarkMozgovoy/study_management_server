@@ -4,6 +4,7 @@ import facility_db_access
 import permission_db_access
 import study_db_access
 import deployment_db_access
+import errors
 from dbhelper import toJson
 
 app = Flask(__name__)
@@ -40,8 +41,7 @@ def getAllFacilities():
 #Study endpoints
 @app.route('/studies', methods=['POST'])
 def createStudy():
-    if not userTokenIsValid():
-        return invalidUserTokenMessage, 401
+    validateUser()
     studyData = request.get_json()
     study = study_db_access.createStudy(studyData)
     permission_db_access.createOwnerForStudy(getUserId(), study.studyId)
@@ -49,77 +49,87 @@ def createStudy():
 
 @app.route('/studies', methods=['GET'])
 def getStudiesForUser():
-    if not userTokenIsValid():
-        return invalidUserTokenMessage, 401
+    validateUser()
     studyList = permission_db_access.getStudiesForUser(getUserId())
     return toJson(studyList)
 
 @app.route('/studies/<studyId>', methods=['GET'])
 def getStudy(studyId):
-    if not userTokenIsValid():
-        return invalidUserTokenMessage, 401
-    if not userHasPermission(studyId):
-        return userNotAuthorizedMessage, 401
+    validateUser(studyId)
     study = study_db_access.getStudy(studyId)
     return toJson(study)
 
 @app.route('/studies/<studyId>/facilities', methods=['GET'])
 def getFacilitiesForStudy(studyId):
-    if not userTokenIsValid():
-        return invalidUserTokenMessage, 401
-    if not userHasPermission(studyId):
-        return userNotAuthorizedMessage, 401
+    validateUser(studyId)
     facilityList = facility_db_access.getFacilitiesForStudy(studyId)
     return toJson(facilityList)
 
 @app.route('/studies/<studyId>/permissions', methods=['POST'])
 def createPermissionForStudy(studyId):
-    if not userTokenIsValid():
-        return invalidUserTokenMessage, 401
-    if not userHasPermission(studyId):
-        return userNotAuthorizedMessage, 401
+    validateUser(studyId)
     userId = request.get_json()["userId"]
     userPermission = permission_db_access.createAdminForStudy(userId, studyId)
     return toJson(userPermission)
 
 @app.route('/studies/<studyId>/permissions', methods=['GET'])
 def getPermissionsForStudy(studyId):
-    if not userTokenIsValid():
-        return invalidUserTokenMessage, 401
-    if not userHasPermission(studyId):
-        return userNotAuthorizedMessage, 401
+    validateUser(studyId)
     userPermissionList = permission_db_access.getPermissionsForStudy(studyId)
     return toJson(userPermissionList)
 
 @app.route('/studies/<studyId>/deployments', methods=['GET'])
 def getAllDeploymentsForStudy(studyId):
-    if not userTokenIsValid():
-        return invalidUserTokenMessage, 401
-    if not userHasPermission(studyId):
-        return userNotAuthorizedMessage, 401
+    validateUser(studyId)
     deploymentList = deployment_db_access.getAllDeploymentsForStudy(studyId)
     return toJson(deploymentList)
 
+@app.route('/studies/<studyId>/deployments', methods=['POST'])
+def createDeploymentForStudy(studyId):
+    validateUser(studyId)
+    deploymentData = request.get_json()
+    deployment = deployment_db_access.createDeploymentForStudy(studyId, deploymentData)
+    return toJson(deployment)
+
 @app.route('/studies/<studyId>/deployments/<deploymentId>', methods=['GET'])
 def getDeploymentForStudy(studyId, deploymentId):
-    if not userTokenIsValid():
-        return invalidUserTokenMessage, 401
-    if not userHasPermission(studyId):
-        return userNotAuthorizedMessage, 401
+    validateUser(studyId)
     deployment = deployment_db_access.getDeploymentForStudy(studyId, deploymentId)
     return toJson(deployment)
 
 #Authentication helper functions
-def userTokenIsValid():
-    #TODO: validate the signature and expiration time of the user token
+def validateUser(studyId=None):
+    #TODO
+    #if userToken does not exist
+    #   raise errors.UnauthorizedError("User token not provided")
+    #if userToken signature is invalid
+    #   raise errors.UnauthorizedError("User token signature is invalid")
+    #if userToken expired
+    #   raise errors.UnauthorizedError("User token signature is invalid")
+    if studyId!=None:
+        if not permission_db_access.userHasPermissionForStudy(getUserId(), studyId):
+            raise errors.ForbiddenError("User does not have permission to access " + studyId)
     return True
 
-def userHasPermission(studyId):
-    return permission_db_access.userHasPermissionForStudy(getUserId(), studyId)
-
 def getUserId():
-    #TODO: userId must be a unique and unmodifiable attribute of the user token
+    #TODO: get userId from the userToken
+    #We need userId to be unique, unmodifiable, and human-readable
+    #(such as email or username) so that users can give other users
+    #permissions by manualy typing their userId
     return "USER:TEST_USER"
+
+#Error Handling
+@app.errorhandler(404)
+def pageNotFound(e):
+    return toJson({"error":type(e).__name__, "status":404, "message":str(e)}), 404
+
+@app.errorhandler(500)
+def internalServerError(e):
+    return toJson({"error":type(e).__name__, "status":500, "message":"Internal Server Error"}), 500
+
+@app.errorhandler(errors.APIError)
+def handleAPIError(e):
+    return toJson({"error":type(e).__name__, "status":e.getStatusCode(), "message":str(e)}), e.getStatusCode()
 
 #Developing locally
 if __name__ == '__main__':

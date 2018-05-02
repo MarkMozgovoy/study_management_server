@@ -13,8 +13,8 @@ class Study(DBHelper):
         self.archived = False
         self.deploymentList = []
         self.equipmentList = []
-    def modifyDate(self):
-        self.dateModified = str(datetime.now())
+    def modifyDate(self, date=str(datetime.now())):
+        self.dateModified = date
     def getIdOrDictAsChild(self, forDynamo):
         """Return object id if object has its own table in Dynamo and forDynamo==true, else return dict"""
         if forDynamo:
