@@ -6,6 +6,8 @@ import study_db_access
 import deployment_db_access
 import errors
 from dbhelper import toJson
+import jwt
+from jwt.contrib.algorithms.pycrypto import RSAAlgorithm
 
 app = Flask(__name__)
 
@@ -101,25 +103,39 @@ def getDeploymentForStudy(studyId, deploymentId):
     return toJson(deployment)
 
 #Authentication helper functions
-def validateUser(studyId=None):
-    #TODO
-    #if userToken does not exist
-    #   raise errors.UnauthorizedError("User token not provided")
-    #if userToken signature is invalid
-    #   raise errors.UnauthorizedError("User token signature is invalid")
-    #if userToken expired
-    #   raise errors.UnauthorizedError("User token signature is invalid")
+def validateUser(studyId=None, token):
+    pems_dict = {
+        'kid1': 'pem1',
+        'kid2': 'pem2'
+    }
+
+    kid = jwt.get_unverified_header(token)['kid']
+    pem = pems_dict.get(kid, None)
+
+    if pem is None:
+        print 'kid false'
+        return False
+
+    try:
+        decoded_token = jwt.decode(token, pem, algorithms=['RS256'])
+        iss = 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_qI2amo5xv'
+        if decoded_token['iss'] != iss:
+            print 'iss false'
+            return False
+        elif decoded_token['token_use'] != 'access':
+            print 'access false'
+            return False
+        return True
+    except Exception:
+        return False
     if studyId!=None:
         if not permission_db_access.userHasPermissionForStudy(getUserId(), studyId):
             raise errors.ForbiddenError("User does not have permission to access " + studyId)
     return True
 
 def getUserId():
-    #TODO: get userId from the userToken
-    #We need userId to be unique, unmodifiable, and human-readable
-    #(such as email or username) so that users can give other users
-    #permissions by manualy typing their userId
-    return "USER:TEST_USER"
+    userId = jwt.GetUser.Username
+    return userId
 
 #Error Handling
 @app.errorhandler(404)
