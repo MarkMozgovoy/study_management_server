@@ -113,17 +113,17 @@ def validateUser(studyId=None, token):
     pem = pems_dict.get(kid, None)
 
     if pem is None:
-        print 'kid false'
+        print('kid false')
         return False
 
     try:
         decoded_token = jwt.decode(token, pem, algorithms=['RS256'])
         iss = 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_qI2amo5xv'
         if decoded_token['iss'] != iss:
-            print 'iss false'
+            print('iss false')
             return False
         elif decoded_token['token_use'] != 'access':
-            print 'access false'
+            print('access false')
             return False
         return True
     except Exception:
