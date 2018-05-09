@@ -1,9 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, Response
 import equipment_db_access
 import facility_db_access
 import permission_db_access
 import study_db_access
 import deployment_db_access
+import s3_access
 import errors
 from dbhelper import toJson
 
@@ -113,6 +114,23 @@ def updateDeploymentForStudy(studyId, deploymentId):
     deploymentData = request.get_json()
     deployment = deployment_db_access.updateDeployment(studyId, deploymentId, deploymentData)
     return toJson(deployment)
+
+@app.route('/studies/<studyId>/resources', methods=['POST'])
+def createResourceForStudy(studyId):
+    validateUser(studyId)
+    file = request.files['user_file']
+    fileName = s3_access.uploadFile(studyId, file)
+    return toJson({"message": "file uploaded successfully", "fileName":fileName})
+
+@app.route('/studies/<studyId>/resources/<fileName>', methods=['GET'])
+def getResourceForStudy(studyId, fileName):
+    validateUser(studyId)
+    file = s3_access.downloadFile(studyId, fileName)
+    return Response(
+        file['Body'].read(),
+        mimetype='text/plain',
+        headers={"Content-Disposition": "attachment;filename="+fileName}
+    )
 
 #Authentication helper functions
 def validateUser(studyId=None):

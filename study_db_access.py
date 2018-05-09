@@ -47,6 +47,7 @@ def updateStudy(studyId, studyData):
         oldStudy.name = newStudy.name
         oldStudy.description = newStudy.description
         oldStudy.equipmentList = newStudy.equipmentList
+        oldStudy.resourceList = newStudy.resourceList
     if (oldStudy.status=="DESIGNED"):
         if not (newStudy.status in ["DESIGNED", "DEPLOYED", "TERMINATED"]):
             raise errors.BadRequestError("status of a DESIGNED study can only be updated to DEPLOYED or TERMINATED")
@@ -128,4 +129,6 @@ def loadStudy(studyData):
         s.deploymentList = deployment_db_access.loadDeploymentList(studyData["deploymentList"])
     if "equipmentList" in studyData:
         s.equipmentList = equipment_db_access.loadEquipmentList(studyData["equipmentList"])
+    if "resourceList" in studyData:
+        s.resourceList = studyData["resourceList"]
     return s

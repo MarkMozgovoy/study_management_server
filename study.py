@@ -13,6 +13,7 @@ class Study(DBHelper):
         self.archived = False
         self.deploymentList = []
         self.equipmentList = []
+        self.resourceList = []
     def modifyDate(self):
         self.dateModified = str(datetime.now())
     def getIdOrDictAsChild(self, forDynamo):
