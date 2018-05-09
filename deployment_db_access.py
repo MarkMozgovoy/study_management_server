@@ -1,3 +1,4 @@
+from decimal import Decimal
 from deployment import Deployment
 import facility_db_access
 import study_db_access
@@ -8,7 +9,7 @@ def createDeployment(studyId, deploymentData):
     #check that deploymentData is valid
     if not ("name" in deploymentData and type(deploymentData["name"])==str and len(deploymentData["name"])>0):
         raise errors.BadRequestError("Deployment must have attribute 'name' (type=str and length>0)")
-    if not ("goalSampleSize" in deploymentData and type(deploymentData["goalSampleSize"])==int and deploymentData["goalSampleSize"]>0):
+    if not ("goalSampleSize" in deploymentData and type(deploymentData["goalSampleSize"]) in [int, Decimal] and deploymentData["goalSampleSize"]>0):
         raise errors.BadRequestError("Deployment must have attribute 'goalSampleSize' (type=int and value>0)")
     if not ("facility" in deploymentData and type(deploymentData["facility"]) in [str, dict] and len(deploymentData["facility"])>0):
         raise errors.BadRequestError("Deployment must have attribute 'facility' (type=str or dict and length>0)")
@@ -23,7 +24,7 @@ def createDeployment(studyId, deploymentData):
     return study_db_access.createDeploymentForStudy(studyId, d)
 
 def getDeployment(studyId, deploymentId):
-    for deployment in getAllDeploymentsForStudy(studyId):
+    for deployment in getAllDeployments(studyId):
         if deployment.deploymentId==deploymentId:
             return deployment
     return {}
@@ -33,7 +34,7 @@ def getAllDeployments(studyId):
     return study.deploymentList
 
 def updateDeployment(studyId, deploymentId, deploymentData):
-    oldDeployment = getDeploymentForStudy(studyId, deploymentId)
+    oldDeployment = getDeployment(studyId, deploymentId)
     newDeployment = loadDeployment(deploymentData)
     #check that the deployment can be updated
     if not (oldDeployment.deploymentId==newDeployment.deploymentId):
@@ -88,9 +89,9 @@ def loadDeployment(deploymentData):
         raise errors.BadRequestError("Deployment must have attribute 'dateCreated' (type=str and length>0)")
     if not ("archived" in deploymentData and type(deploymentData["archived"])==bool):
         raise errors.BadRequestError("Deployment must have attribute 'archived' (type=bool)")
-    if not ("goalSampleSize" in deploymentData and type(deploymentData["goalSampleSize"])==int and deploymentData["goalSampleSize"]>0):
+    if not ("goalSampleSize" in deploymentData and type(deploymentData["goalSampleSize"]) in [int, Decimal] and deploymentData["goalSampleSize"]>0):
         raise errors.BadRequestError("Deployment must have attribute 'goalSampleSize' (type=int and value>0)")
-    if not ("currentSampleSize" in deploymentData and type(deploymentData["currentSampleSize"])==int and deploymentData["currentSampleSize"]>=0):
+    if not ("currentSampleSize" in deploymentData and type(deploymentData["currentSampleSize"]) in [int, Decimal] and deploymentData["currentSampleSize"]>=0):
         raise errors.BadRequestError("Deployment must have attribute 'currentSampleSize' (type=int and value>=0)")
     if not ("facility" in deploymentData and type(deploymentData["facility"]) in [str, dict] and len(deploymentData["facility"])>0):
         raise errors.BadRequestError("Deployment must have attribute 'facility' (type=str or dict and length>0)")
