@@ -108,7 +108,7 @@ def getDeploymentForStudy(studyId, deploymentId):
     return toJson(deployment)
 
 @app.route('/studies/<studyId>/deployments/<deploymentId>', methods=['PUT'])
-def updateStudy(studyId, deploymentId):
+def updateDeploymentForStudy(studyId, deploymentId):
     validateUser(studyId)
     deploymentData = request.get_json()
     deployment = deployment_db_access.updateDeployment(studyId, deploymentId, deploymentData)
