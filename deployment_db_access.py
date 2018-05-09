@@ -4,13 +4,7 @@ import study_db_access
 import errors
 
 ##CRUD functions that read/write to dynamo
-def createDeploymentForStudy(studyId, deploymentData):
-    #check that a deployment can be created for the study
-    s = study_db_access.getStudy(studyId)
-    if s.status=="TERMINATED" or s.status=="CREATED":
-        raise errors.BadRequestError("Unable to create deployment for "+s.status+" studies")
-    if not (s.status=="DESIGNED" or s.status=="DEPLOYED" or s.status=="PAUSED"):
-        raise errors.APIError("Study has unknown status type")
+def createDeployment(studyId, deploymentData):
     #check that deploymentData is valid
     if not ("name" in deploymentData and type(deploymentData["name"])==str and len(deploymentData["name"])>0):
         raise errors.BadRequestError("Deployment must have attribute 'name' (type=str and length>0)")
@@ -18,9 +12,6 @@ def createDeploymentForStudy(studyId, deploymentData):
         raise errors.BadRequestError("Deployment must have attribute 'goalSampleSize' (type=int and value>0)")
     if not ("facility" in deploymentData and type(deploymentData["facility"])==str and len(deploymentData["facility"])>0):
         raise errors.BadRequestError("Deployment must have attribute 'facility' (type=str and length>0)")
-    facility = facility_db_access.getFacility(deploymentData["facility"])
-    if not facility_db_access.facilityContainsAllEquipment(facility, s.equipmentList):
-        raise errors.BadRequestError("Deployment 'facility' must have all of the equpiment required by its Study")
     #construct the deployment
     d = Deployment()
     d.name = deploymentData["name"]
@@ -29,10 +20,7 @@ def createDeploymentForStudy(studyId, deploymentData):
     d.goalSampleSize = int(deploymentData["goalSampleSize"])
     d.facility = facility_db_access.loadFacility(deploymentData["facility"])
     #create the deployment (by updating its parent study)
-    s.deploymentList.append(d)
-    s.modifyDate(d.dateModified)
-    study_db_access.updateStudy(s)
-    return d
+    return study_db_access.createDeploymentForStudy(studyId, d)
 
 def getDeploymentForStudy(studyId, deploymentId):
     for deployment in getAllDeploymentsForStudy(studyId):

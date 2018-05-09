@@ -91,7 +91,7 @@ def getAllDeploymentsForStudy(studyId):
 def createDeploymentForStudy(studyId):
     validateUser(studyId)
     deploymentData = request.get_json()
-    deployment = deployment_db_access.createDeploymentForStudy(studyId, deploymentData)
+    deployment = deployment_db_access.createDeployment(studyId, deploymentData)
     return toJson(deployment)
 
 @app.route('/studies/<studyId>/deployments/<deploymentId>', methods=['GET'])

@@ -1,6 +1,7 @@
 import boto3
 from study import Study
 import equipment_db_access
+import facility_db_access
 import deployment_db_access
 import errors
 
@@ -31,6 +32,19 @@ def getStudy(studyId):
 def updateStudy(study):
     StudyTable.put_item(Item=study.toDynamo())
     return study
+
+def createDeploymentForStudy(studyId, deployment):
+    s = getStudy(studyId)
+    if s.status=="TERMINATED" or s.status=="CREATED":
+        raise errors.BadRequestError("Unable to create deployment for "+s.status+" studies")
+    if not (s.status=="DESIGNED" or s.status=="DEPLOYED" or s.status=="PAUSED"):
+        raise errors.APIError("Study has unknown status type")
+    if not facility_db_access.facilityContainsAllEquipment(deployment.facility, s.equipmentList):
+        raise errors.BadRequestError("Deployment 'facility' must have all of the equpiment required by its Study")
+    s.deploymentList.append(deployment)
+    s.modifyDate(deployment.dateModified)
+    StudyTable.put_item(Item=s.toDynamo())
+    return deployment
 
 #Helper functions to convert lists/dicts into Study objects
 def loadStudy(studyData):
