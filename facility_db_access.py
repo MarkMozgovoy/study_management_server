@@ -23,7 +23,10 @@ def createFacility(facilityData):
 
 def getFacility(facilityId):
     response = FacilityTable.get_item(Key={"facilityId":facilityId})
-    facilityData = response["Item"]
+    try:
+        facilityData = response["Item"]
+    except KeyError:
+        raise errors.APIError("No facility found for id: " + str(facilityId))
     return loadFacility(facilityData)
 
 def getAllFacilities():

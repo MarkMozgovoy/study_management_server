@@ -72,7 +72,7 @@ def updateStudy(studyId, studyData):
 def createDeploymentForStudy(studyId, deployment):
     s = getStudy(studyId)
     if not (s.status in ["DESIGNED", "DEPLOYED", "PAUSED"]):
-        raise errors.APIError("Deployments can only be created for DESIGNED, DEPLOYED, and PAUSED studies")
+        raise errors.BadRequestError("Deployments can only be created for DESIGNED, DEPLOYED, and PAUSED studies")
     if not facility_db_access.facilityContainsAllEquipment(deployment.facility, s.equipmentList):
         raise errors.BadRequestError("Deployment 'facility' must have all of the equpiment required by its Study")
     s.deploymentList.append(deployment)
