@@ -80,6 +80,24 @@ def createDeploymentForStudy(studyId, deployment):
     StudyTable.put_item(Item=s.toDynamo())
     return deployment
 
+def updateDeploymentForStudy(studyId, deployment):
+    s = getStudy(studyId)
+    if not (s.status in ["DESIGNED", "DEPLOYED", "PAUSED"]):
+        raise errors.BadRequestError("Deployments can only be updated for DESIGNED, DEPLOYED, and PAUSED studies")
+    if not facility_db_access.facilityContainsAllEquipment(deployment.facility, s.equipmentList):
+        raise errors.BadRequestError("Deployment 'facility' must have all of the equpiment required by its Study")
+    allDeploymentsArePausedOrTerminated = True
+    for i in range(len(s.deploymentList)):
+        if s.deploymentList[i].deploymentId==deployment.deploymentId:
+            s.deploymentList[i] = deployment
+        if s.deploymentList[i].status not in ["PAUSED", "TERMINATED"]:
+            allDeploymentsArePausedOrTerminated = False
+    if allDeploymentsArePausedOrTerminated and s.status=="DEPLOYED":
+        s.status = "PAUSED"
+    s.modifyDate()
+    StudyTable.put_item(Item=s.toDynamo())
+    return deployment
+
 #Helper functions to convert lists/dicts into Study objects
 def loadStudy(studyData):
     """Returns a Study object for the given data"""
@@ -92,6 +110,8 @@ def loadStudy(studyData):
         raise errors.BadRequestError("Study must have attribute 'status' (type=str and length>0)")
     if not ("dateCreated" in studyData and type(studyData["dateCreated"])==str and len(studyData["dateCreated"])>0):
         raise errors.BadRequestError("Study must have attribute 'dateCreated' (type=str and length>0)")
+    if not ("dateModified" in studyData and type(studyData["dateModified"])==str and len(studyData["dateModified"])>0):
+        raise errors.BadRequestError("Study must have attribute 'dateModified' (type=str and length>0)")
     if not ("archived" in studyData and type(studyData["archived"])==bool):
         raise errors.BadRequestError("Study must have attribute 'archived' (type=bool)")
     #construct the study

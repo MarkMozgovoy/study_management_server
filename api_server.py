@@ -91,7 +91,7 @@ def getPermissionsForStudy(studyId):
 @app.route('/studies/<studyId>/deployments', methods=['GET'])
 def getAllDeploymentsForStudy(studyId):
     validateUser(studyId)
-    deploymentList = deployment_db_access.getAllDeploymentsForStudy(studyId)
+    deploymentList = deployment_db_access.getAllDeployments(studyId)
     return toJson(deploymentList)
 
 @app.route('/studies/<studyId>/deployments', methods=['POST'])
@@ -104,7 +104,14 @@ def createDeploymentForStudy(studyId):
 @app.route('/studies/<studyId>/deployments/<deploymentId>', methods=['GET'])
 def getDeploymentForStudy(studyId, deploymentId):
     validateUser(studyId)
-    deployment = deployment_db_access.getDeploymentForStudy(studyId, deploymentId)
+    deployment = deployment_db_access.getDeployment(studyId, deploymentId)
+    return toJson(deployment)
+
+@app.route('/studies/<studyId>/deployments/<deploymentId>', methods=['PUT'])
+def updateStudy(studyId, deploymentId):
+    validateUser(studyId)
+    deploymentData = request.get_json()
+    deployment = deployment_db_access.updateDeployment(studyId, deploymentId, deploymentData)
     return toJson(deployment)
 
 #Authentication helper functions
