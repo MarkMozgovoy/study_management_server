@@ -43,22 +43,22 @@ def updateStudy(studyId, studyData):
     oldStudy.archived = newStudy.archived
     if (oldStudy.status=="CREATED"):
         if not (newStudy.status in ["CREATED", "DESIGNED", "TERMINATED"]):
-            raise errors.BadRequest("status of a CREATED study can only be updated to DESIGNED or TERMINATED")
+            raise errors.BadRequestError("status of a CREATED study can only be updated to DESIGNED or TERMINATED")
         oldStudy.name = newStudy.name
         oldStudy.description = newStudy.description
         oldStudy.equipmentList = newStudy.equipmentList
     if (oldStudy.status=="DESIGNED"):
         if not (newStudy.status in ["DESIGNED", "DEPLOYED", "TERMINATED"]):
-            raise errors.BadRequest("status of a DESIGNED study can only be updated to DEPLOYED or TERMINATED")
+            raise errors.BadRequestError("status of a DESIGNED study can only be updated to DEPLOYED or TERMINATED")
     if (oldStudy.status=="DEPLOYED"):
         if not (newStudy.status in ["DEPLOYED", "PAUSED", "TERMINATED"]):
-            raise errors.BadRequest("status of a DEPLOYED study can only be updated to PAUSED or TERMINATED")
+            raise errors.BadRequestError("status of a DEPLOYED study can only be updated to PAUSED or TERMINATED")
     if (oldStudy.status=="PAUSED"):
         if not (newStudy.status in ["DEPLOYED", "PAUSED", "TERMINATED"]):
-            raise errors.BadRequest("status of a PAUSED study can only be updated to DEPLOYED or TERMINATED")
+            raise errors.BadRequestError("status of a PAUSED study can only be updated to DEPLOYED or TERMINATED")
     if (oldStudy.status=="TERMINATED"):
         if not (newStudy.status=="TERMINATED"):
-            raise errors.BadRequest("Cannot change the status of a TERMINATED study")
+            raise errors.BadRequestError("Cannot change the status of a TERMINATED study")
     if (newStudy.status=="TERMINATED"):
         for d in oldStudy.deploymentList:
             if not d.status=="TERMINATED":

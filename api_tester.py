@@ -11,10 +11,10 @@ class APITester():
     def sendRequest(self):
         url = base_url + self.url
         if self.requestType=="GET":
-            return requests.get(url)
+            return requests.get(url).text
         if self.requestType=="POST":
-            return requests.post(url, data=json.dumps(self.data), headers=self.headers)
+            return requests.post(url, data=json.dumps(self.data), headers=self.headers).text
         if self.requestType=="PUT":
-            return requests.put(url, data=json.dumps(self.data), headers=self.headers)
+            return requests.put(url, data=json.dumps(self.data), headers=self.headers).text
         if self.requestType=="DELETE":
-            return requests.delete(url)
+            return requests.delete(url).text
