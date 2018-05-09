@@ -59,6 +59,13 @@ def getStudy(studyId):
     study = study_db_access.getStudy(studyId)
     return toJson(study)
 
+@app.route('/studies/<studyId>', methods=['PUT'])
+def updateStudy(studyId):
+    validateUser(studyId)
+    studyData = request.get_json()
+    study = study_db_access.updateStudy(studyId, studyData)
+    return toJson(study)
+
 @app.route('/studies/<studyId>/facilities', methods=['GET'])
 def getFacilitiesForStudy(studyId):
     validateUser(studyId)
